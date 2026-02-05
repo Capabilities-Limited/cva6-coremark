@@ -48,8 +48,8 @@ vpath %.h $(PORT_DIR)
 vpath %.mak $(PORT_DIR)
 include $(PORT_DIR)/core_portme.mak
 
-ifndef ITERATIONS
-ITERATIONS=0
+ifndef $(ITERATIONS)
+ITERATIONS=4
 endif
 ifdef REBUILD
 FORCE_REBUILD=force_rebuild
@@ -77,7 +77,13 @@ ifdef SEPARATE_COMPILE
 $(OPATH)$(PORT_DIR):
 	$(MKDIR) $(OPATH)$(PORT_DIR)
 
-compile: $(OPATH) $(OPATH)$(PORT_DIR) $(OBJS) $(HEADERS) 
+%.o: %.s
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+%.o: ../%.S
+	$(CC) $(ASFLAGS) -c -o $@ $<
+
+compile: $(OPATH) $(OPATH) $(PORT_DIR) $(OBJS) $(HEADERS) 
 link: compile 
 	$(LD) $(LFLAGS) $(XLFLAGS) $(OBJS) $(LOUTCMD)
 	
