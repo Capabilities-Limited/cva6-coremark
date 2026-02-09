@@ -202,6 +202,7 @@ void portable_fini(core_portable *p);
 #endif
 #endif
 
+__attribute__((noinline))
 int ee_printf(const char *fmt, ...);
 
 #endif /* CORE_PORTME_H */

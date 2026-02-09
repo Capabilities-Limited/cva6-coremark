@@ -22,7 +22,7 @@ ifeq ($(CHERI),1)
 TOOLCHAIN:=LLVM
 endif
 
-CCDIR   ?= /Users/jonathanwoodruff/cheri/output/sdk/bin/
+CCDIR   ?= /home/jdw57/llvm-zcheri/bin/
 ifeq ($(TOOLCHAIN),LLVM)
 CC      := $(CCDIR)/clang
 LD      := $(CCDIR)/ld.lld
@@ -42,12 +42,12 @@ endif
 
 ifeq ($(TOOLCHAIN),LLVM)
 ifeq ($(CHERI),1)
-  RISCV_FLAGS += -target riscv64-unknown-elf -march=rv64imafdzcherihybrid -mabi=l64pc128d
+  RISCV_FLAGS += -target riscv64-unknown-elf -march=rv64imafdzcheripurecap_zcherihybrid -mabi=l64pc128d
 else
-  RISCV_FLAGS += -target riscv64-unknown-elf -march=rv64imafdc -mabi=lp64
+  RISCV_FLAGS += -target riscv64-unknown-elf -march=rv64imafdc_zba_zbb_zbc_zbs_zicond1p0 -mabi=lp64d -menable-experimental-extensions
 endif
 else
-  RISCV_FLAGS += -march=rv64imafdc -mabi=lp64d
+  RISCV_FLAGS += -march=rv64imafdc_zba_zbb_zbc_zbs -mabi=lp64d
 endif
 
 # Define sources and compilation outputs.
@@ -71,13 +71,15 @@ CFLAGS := \
 	-DCLOCKS_PER_SEC=$(CLOCKS_PER_SEC) \
 	-DHAS_FLOAT=1 \
 	-DRUNS=$(RUNS) \
-	-O2 \
 	-Wall \
 	-static \
 	-std=gnu99 \
 	-ffast-math \
 	-fno-common \
+	-fno-builtin \
 	-fno-builtin-printf \
+	-mcmodel=medany \
+	-fno-pic \
 	-I$(COMMON_DIR)
 ASFLAGS := $(CFLAGS)
 LDFLAGS := \
@@ -86,6 +88,7 @@ LDFLAGS := \
 	-nostdlib \
 	-nodefaultlibs \
 	-nostartfiles \
+	-Wl,--relax-gp \
 	$(LIBS) \
 	-T $(LINKER_SCRIPT)
 

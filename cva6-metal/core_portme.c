@@ -125,7 +125,9 @@ void portable_fini(core_portable *p)
 {
 	p->portable_id=0;
 }
+__attribute__((noinline))
 int ee_printf(const char *fmt, ...) {
+	asm volatile("" ::: "memory");
 	return 0;
 };
 
